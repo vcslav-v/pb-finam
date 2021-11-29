@@ -30,7 +30,7 @@ endef
 
 define FASTAPI_ROUTES
 echo "from fastapi import APIRouter" >> $(APP_NAME)/api/routes.py
-echo "from tags_agr.api.local_routes import api" >> $(APP_NAME)/api/routes.py
+echo "from $(APP_NAME).api.local_routes import api" >> $(APP_NAME)/api/routes.py
 echo "" >> $(APP_NAME)/api/routes.py
 echo "routes = APIRouter()" >> $(APP_NAME)/api/routes.py
 echo "" >> $(APP_NAME)/api/routes.py
@@ -67,6 +67,14 @@ echo "" >> $(APP_NAME)/api/local_routes/api.py
 echo "@router.get('/test')" >> $(APP_NAME)/api/local_routes/api.py
 echo "def test( _: str = Depends(get_current_username)):" >> $(APP_NAME)/api/local_routes/api.py
 echo "     pass >> $(APP_NAME)/api/local_routes/api.py
+
+echo "from fastapi import FastAPI" >> $(APP_NAME)/main.py
+echo "from $(APP_NAME).api.routes import routes" >> $(APP_NAME)/main.py
+echo "" >> $(APP_NAME)/main.py
+echo "app = FastAPI(debug=True)" >> $(APP_NAME)/main.py
+echo "" >> $(APP_NAME)/main.py
+echo "app.include_router(routes)" >> $(APP_NAME)/main.py
+
 
 endef
 
@@ -138,6 +146,7 @@ fastapi:
 	poetry add uvicorn
 	poetry add python-multipart
 	poetry add pydantic
+	touch $(APP_NAME)/main.py
 	mkdir $(APP_NAME)/api
 	touch $(APP_NAME)/api/__init__.py
 	touch $(APP_NAME)/api/routes.py
