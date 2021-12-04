@@ -304,9 +304,9 @@ def get_short_stat() -> schemas.ShortStat:
                 currency=trans.currency
             ).first()
             if trans.category_id in income_cats_id:
-                income += int((trans.value / 100) * exchange_rate.value)
+                income += int((trans.value / 100) / exchange_rate.value)
             elif trans.category_id in expense_cats_id:
-                expense += int((trans.value / 100) * exchange_rate.value)
+                expense += int((trans.value / 100) / exchange_rate.value)
         profit = income - expense
         now_month = schemas.MonthShortStat(
             name=today.strftime("%B"),
