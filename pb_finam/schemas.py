@@ -1,0 +1,68 @@
+from __future__ import annotations
+from pydantic import BaseModel
+from datetime import date as date_type
+from typing import Optional
+
+
+class Node(BaseModel):
+    id: Optional[int]
+    name: str
+    children: list[Node] = []
+
+
+Node.update_forward_refs()
+
+
+class Settings(BaseModel):
+    """DB settings"""
+    currencies: list[str]
+    categories: list[Node]
+
+
+class Transaction(BaseModel):
+    id: Optional[int]
+    date: date_type
+    value: int
+    comment: str
+    currency_id: int
+    category_id: int
+    category_id_path: Optional[list[int]]
+
+
+class PageTransaction(BaseModel):
+    id: int
+    date: str
+    value: str
+    comment: str
+    base_category: str
+    category: str
+
+
+class TransactionPage(BaseModel):
+    rows: list[PageTransaction] = []
+
+
+class GetTransactionPage(BaseModel):
+    from_date: date_type
+    page: Optional[int]
+
+
+class MonthShortStat(BaseModel):
+    name: str
+    income: int
+    expense: int
+    profit: int
+
+
+class ShortStat(BaseModel):
+    now_month: MonthShortStat
+    past_month: MonthShortStat
+
+
+class Item(BaseModel):
+    id: int
+    name: str
+
+
+class Items(BaseModel):
+    items: list[Item] = []

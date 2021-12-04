@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Date, ForeignKey, Integer, Text, Float
+from sqlalchemy import Column, Date, ForeignKey, Integer, Text, Float, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -15,12 +16,10 @@ class Transaction(Base):
     date = Column(Date)
     value = Column(Integer)
     comment = Column(Text)
+    date_create = Column(DateTime, default=datetime.now())
 
     currency_id = Column(Integer, ForeignKey('сurrencies.id'))
     currency = relationship('Currency', back_populates="transactions")
-
-    exchange_rate_id = Column(Integer, ForeignKey('exchange_rates.id'))
-    exchange_rate = relationship('ExchangeRate', back_populates="transactions")
 
     category_id = Column(Integer, ForeignKey('categories.id'))
     category = relationship('Category', back_populates="transactions")
@@ -33,9 +32,13 @@ class Currency(Base):
 
     id = Column(Integer, primary_key=True)
 
-    name = Column(Text)
+    name = Column(Text, unique=True)
+
+    active = Column(Boolean, default=True)
 
     transactions = relationship('Transaction', back_populates="currency")
+
+    exchange_rate = relationship('ExchangeRate', back_populates="currency")
 
 
 class ExchangeRate(Base):
@@ -46,11 +49,10 @@ class ExchangeRate(Base):
     id = Column(Integer, primary_key=True)
 
     date = Column(Date)
-    usdrub = Column(Float)
-    eurrub = Column(Float)
-    eurusd = Column(Float)
+    value = Column(Float)
 
-    transactions = relationship('Transaction', back_populates="exchange_rate")
+    currency_id = Column(Integer, ForeignKey('сurrencies.id'))
+    currency = relationship('Currency', back_populates="exchange_rate")
 
 
 class Category(Base):
@@ -65,20 +67,6 @@ class Category(Base):
     parent_id = Column(Integer, ForeignKey('categories.id'))
     parent = relationship('Category', remote_side=[id])
     children = relationship('Category')
+    active = Column(Boolean, default=True)
 
     transactions = relationship('Transaction', back_populates="category")
-
-    direct_id = Column(Integer, ForeignKey('directs.id'))
-    direct = relationship('Direct', back_populates="categories")
-
-
-class Direct(Base):
-    """Categoriy's direct"""
-
-    __tablename__ = 'directs'
-
-    id = Column(Integer, primary_key=True)
-
-    value = Column(Text)
-
-    categories = relationship('Category', back_populates="direct")

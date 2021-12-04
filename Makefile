@@ -58,14 +58,14 @@ echo "    correct_password = secrets.compare_digest(credentials.password, passwo
 echo "    if not (correct_username and correct_password):" >> $(APP_NAME)/api/local_routes/api.py
 echo "        raise HTTPException(" >> $(APP_NAME)/api/local_routes/api.py
 echo "            status_code=status.HTTP_401_UNAUTHORIZED," >> $(APP_NAME)/api/local_routes/api.py
-echo "            detail="Incorrect username or password"," >> $(APP_NAME)/api/local_routes/api.py
-echo "            headers={"WWW-Authenticate": "Basic"}," >> $(APP_NAME)/api/local_routes/api.py
+echo "            detail='Incorrect username or password'," >> $(APP_NAME)/api/local_routes/api.py
+echo "            headers={'WWW-Authenticate': 'Basic'}," >> $(APP_NAME)/api/local_routes/api.py
 echo "        )" >> $(APP_NAME)/api/local_routes/api.py
 echo "    return credentials.username" >> $(APP_NAME)/api/local_routes/api.py
 echo "" >> $(APP_NAME)/api/local_routes/api.py
 echo "" >> $(APP_NAME)/api/local_routes/api.py
 echo "@router.get('/test')" >> $(APP_NAME)/api/local_routes/api.py
-echo "def test( _: str = Depends(get_current_username)):" >> $(APP_NAME)/api/local_routes/api.py
+echo "def test(_: str = Depends(get_current_username)):" >> $(APP_NAME)/api/local_routes/api.py
 echo "     pass >> $(APP_NAME)/api/local_routes/api.py
 
 echo "from fastapi import FastAPI" >> $(APP_NAME)/main.py
