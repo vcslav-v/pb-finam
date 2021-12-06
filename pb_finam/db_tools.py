@@ -168,7 +168,7 @@ def get_transactions(page_data: schemas.GetTransactionPage) -> schemas.Transacti
         ).order_by(
             models.Transaction.date.desc()
         ).order_by(
-            models.Transaction.date_create.desc()
+            models.Transaction.date_create()
         ).slice(start, end)
         for db_transaction in db_transactions:
             category_path = _get_category_path(db_transaction.category)
