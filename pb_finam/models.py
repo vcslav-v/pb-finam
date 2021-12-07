@@ -19,10 +19,10 @@ class Transaction(Base):
     date_create = Column(DateTime, default=datetime.now())
 
     currency_id = Column(Integer, ForeignKey('сurrencies.id'))
-    currency = relationship('Currency', back_populates="transactions")
+    currency = relationship('Currency', back_populates='transactions')
 
     category_id = Column(Integer, ForeignKey('categories.id'))
-    category = relationship('Category', back_populates="transactions")
+    category = relationship('Category', back_populates='transactions')
 
 
 class Currency(Base):
@@ -36,9 +36,9 @@ class Currency(Base):
 
     active = Column(Boolean, default=True)
 
-    transactions = relationship('Transaction', back_populates="currency")
+    transactions = relationship('Transaction', back_populates='currency')
 
-    exchange_rate = relationship('ExchangeRate', back_populates="currency")
+    exchange_rate = relationship('ExchangeRate', back_populates='currency')
 
 
 class ExchangeRate(Base):
@@ -52,7 +52,7 @@ class ExchangeRate(Base):
     value = Column(Float)
 
     currency_id = Column(Integer, ForeignKey('сurrencies.id'))
-    currency = relationship('Currency', back_populates="exchange_rate")
+    currency = relationship('Currency', back_populates='exchange_rate')
 
 
 class Category(Base):
@@ -69,4 +69,4 @@ class Category(Base):
     children = relationship('Category')
     active = Column(Boolean, default=True)
 
-    transactions = relationship('Transaction', back_populates="category")
+    transactions = relationship('Transaction', back_populates='category')

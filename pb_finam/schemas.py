@@ -66,3 +66,17 @@ class Item(BaseModel):
 
 class Items(BaseModel):
     items: list[Item] = []
+
+
+class Debt(BaseModel):
+    name: str
+    value: int
+
+
+class Acc(BaseModel):
+    name: str
+    debt: list[Debt]
+
+
+class Debts(BaseModel):
+    accs: list[Acc]

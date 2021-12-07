@@ -169,6 +169,8 @@ def get_transactions(page_data: schemas.GetTransactionPage) -> schemas.Transacti
             models.Transaction.date.desc()
         ).order_by(
             models.Transaction.date_create
+        ).order_by(
+            models.Transaction.id
         ).slice(start, end)
         for db_transaction in db_transactions:
             category_path = _get_category_path(db_transaction.category)
@@ -343,3 +345,36 @@ def _get_children_ids(cat: models.Category) -> list[int]:
     for child in cat.children:
         result.extend(_get_children_ids(child))
     return result
+
+
+@logger.catch
+def get_debt():
+    with SessionLocal() as session:
+        balance_cat = session.query(models.Category).filter_by(name='Balance').first()
+        debts = schemas.Debts(accs=[])
+        accs_id = [child.id for child in balance_cat.children]
+        sql_req = f'''select sums.currency_id, max(sums.s)
+            from (
+                select currency_id, sum(value) as s
+                from transactions
+                group by currency_id, category_id
+                having category_id in ({", ".join(map(lambda x: str(x), accs_id))})
+            ) as sums
+            group by currency_id;'''
+        max_debts = session.execute(sql_req)
+        max_debts = {item[0]: item[1] for item in max_debts}
+        for db_acc in balance_cat.children:
+            sql_req = f'''select currency_id, sum(transactions.value)
+                from transactions
+                where category_id = {db_acc.id}
+                group by currency_id
+                order by currency_id;
+            '''
+            acc = schemas.Acc(name=db_acc.name, debt=[])
+            for cur_debt in session.execute(sql_req):
+                cur_id, value = cur_debt
+                max_balance = max_debts[cur_id]
+                cur = session.query(models.Currency).filter_by(id=cur_id).first()
+                acc.debt.append(schemas.Debt(name=cur.name, value=max_balance - value))
+            debts.accs.append(acc)
+        return debts

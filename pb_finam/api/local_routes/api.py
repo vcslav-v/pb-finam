@@ -67,3 +67,8 @@ def get_category_tree(
 @router.get('/сurrencies')
 def get_сurrencies(_: str = Depends(get_current_username)) -> schemas.Items:
     return db_tools.get_сurrencies()
+
+
+@router.get('/debt')
+def get_debt(_: str = Depends(get_current_username)) -> schemas.Debts:
+    return db_tools.get_debt()
