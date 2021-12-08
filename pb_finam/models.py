@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Date, ForeignKey, Integer, Text, Float, Boolean, DateTime
+from sqlalchemy import (Boolean, Column, Date, DateTime, Float, ForeignKey,
+                        Integer, Text)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -16,7 +17,7 @@ class Transaction(Base):
     date = Column(Date)
     value = Column(Integer)
     comment = Column(Text)
-    date_create = Column(DateTime, default=datetime.now())
+    date_create = Column(DateTime, onupdate=func.now(), default=func.now())
 
     currency_id = Column(Integer, ForeignKey('сurrencies.id'))
     currency = relationship('Currency', back_populates='transactions')
