@@ -47,16 +47,12 @@ class GetTransactionPage(BaseModel):
     page: Optional[int]
 
 
-class MonthShortStat(BaseModel):
-    name: str
-    income: int
-    expense: int
-    profit: int
-
-
 class ShortStat(BaseModel):
-    now_month: MonthShortStat
-    past_month: MonthShortStat
+    frm: date_type
+    to: date_type
+    income: Optional[int]
+    expense: Optional[int]
+    profit: Optional[int]
 
 
 class Item(BaseModel):

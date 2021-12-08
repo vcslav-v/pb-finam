@@ -53,8 +53,8 @@ def get_transactions(page_data: schemas.GetTransactionPage, _: str = Depends(get
 
 
 @router.get('/short-stat')
-def get_short_stat(_: str = Depends(get_current_username)):
-    return db_tools.get_short_stat()
+def get_short_stat(fr_to: schemas.ShortStat, _: str = Depends(get_current_username)):
+    return db_tools.get_short_stat(fr_to)
 
 
 @router.get('/category-tree')

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import date, datetime, timedelta
+from datetime import datetime
 
 import requests
 from loguru import logger
@@ -127,7 +127,7 @@ def add_transaction(transaction: schemas.Transaction):
         if not category:
             raise ValueError('Category is not exist')
         db_transaction.category = category
-        _check_exchange_rate(session, transaction.date)
+        # _check_exchange_rate(session, transaction.date)
         session.add(db_transaction)
         session.commit()
 
@@ -269,74 +269,37 @@ def get_сurrencies() -> schemas.Items:
 
 
 @logger.catch
-def get_short_stat() -> schemas.ShortStat:
+def get_short_stat(fr_to: schemas.ShortStat) -> schemas.ShortStat:
     with SessionLocal() as session:
-        today = datetime.now().date()
-        start_month = date(today.year, today.month, 1)
-        past_month = start_month - timedelta(days=1)
-        start_past_month = date(past_month.year, past_month.month, 1)
-        if past_month.day > today.day:
-            check_date_past_month = date(past_month.year, past_month.month, today.day)
-        else:
-            check_date_past_month = past_month
-
-        db_trans_cur = session.query(models.Transaction).filter(
-            models.Transaction.date >= start_month
-        ).filter(
-            models.Transaction.date <= today
-        ).all()
-        db_trans_past = session.query(models.Transaction).filter(
-            models.Transaction.date >= start_past_month
-        ).filter(
-            models.Transaction.date <= check_date_past_month
-        ).all()
         db_income = session.query(models.Category).filter_by(name='Income').first()
         income_cats_id = _get_children_ids(db_income)
         db_expense = session.query(models.Category).filter_by(name='Expense').first()
         expense_cats_id = _get_children_ids(db_expense)
-        income = 0
-        expense = 0
-        profit = 0
-        for trans in db_trans_cur:
-            exchange_rate = session.query(
-                models.ExchangeRate
-            ).filter_by(
-                date=trans.date
-            ).filter_by(
-                currency=trans.currency
-            ).first()
-            if trans.category_id in income_cats_id:
-                income += int((trans.value / 100) / exchange_rate.value)
-            elif trans.category_id in expense_cats_id:
-                expense += int((trans.value / 100) / exchange_rate.value)
+        income_sql_resq = f'''select sum(transactions.value / exchange_rates.value) as dollars
+            from transactions join exchange_rates
+            on exchange_rates.currency_id = transactions.currency_id
+            and exchange_rates.date = transactions.date
+            where transactions.date >= '{fr_to.frm.isoformat()}'
+            and  transactions.date <= '{fr_to.to.isoformat()}'
+            and category_id in ({", ".join(map(lambda x: str(x), income_cats_id))});
+        '''
+        expense_sql_resq = f'''select sum(transactions.value / exchange_rates.value) as dollars
+            from transactions join exchange_rates
+            on exchange_rates.currency_id = transactions.currency_id
+            and exchange_rates.date = transactions.date
+            where transactions.date >= '{fr_to.frm.isoformat()}'
+            and  transactions.date <= '{fr_to.to.isoformat()}'
+            and category_id in ({", ".join(map(lambda x: str(x), expense_cats_id))});
+        '''
+        income = int(next(session.execute(income_sql_resq))[0])
+        expense = int(next(session.execute(expense_sql_resq))[0])
         profit = income - expense
-        now_month = schemas.MonthShortStat(
-            name=today.strftime("%B"),
-            income=income,
-            expense=expense,
-            profit=profit,
-        )
-        income = 0
-        expense = 0
-        profit = 0
-        for trans in db_trans_past:
-            exchange_rate = session.query(
-                trans.currency.exchange_rate
-            ).filter_by(date=trans.date).first()
-            if trans.category_id in income_cats_id:
-                income += int((trans.value / 100) * exchange_rate.value)
-            elif trans.category_id in expense_cats_id:
-                expense += int((trans.value / 100) * exchange_rate.value)
-        profit = income - expense
-        pst_month = schemas.MonthShortStat(
-            name=past_month.strftime("%B"),
-            income=income,
-            expense=expense,
-            profit=profit,
-        )
         return schemas.ShortStat(
-            now_month=now_month,
-            past_month=pst_month,
+            frm=fr_to.frm,
+            to=fr_to.to,
+            income=income,
+            expense=expense,
+            profit=profit
         )
 
 
