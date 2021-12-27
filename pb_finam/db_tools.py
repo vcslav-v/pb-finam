@@ -11,7 +11,7 @@ from pb_finam.db import SessionLocal
 BASE_CAT = '__BASE__'
 OPEN_EXCHANGE_TOKEN = os.environ.get('OPEN_EXCHANGE_TOKEN') or ''
 OPEN_EXCHANGE_ENDPOINT = 'https://openexchangerates.org/api/historical/'
-TRANSACTIONS_IN_PAGE = 10
+TRANSACTIONS_IN_PAGE = 30
 
 
 def _add_currencies(session: SessionLocal, currencies: list[str]):
@@ -127,7 +127,7 @@ def add_transaction(transaction: schemas.Transaction):
         if not category:
             raise ValueError('Category is not exist')
         db_transaction.category = category
-        _check_exchange_rate(session, transaction.date)
+        #_check_exchange_rate(session, transaction.date)
         session.add(db_transaction)
         session.commit()
 
