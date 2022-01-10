@@ -291,6 +291,8 @@ def get_short_stat(fr_to: schemas.ShortStat) -> schemas.ShortStat:
             and  transactions.date <= '{fr_to.to.isoformat()}'
             and category_id in ({", ".join(map(lambda x: str(x), expense_cats_id))});
         '''
+        logger.debug(income_sql_resq)
+        logger.debug(expense_sql_resq)
         income = int(next(session.execute(income_sql_resq))[0])
         expense = int(next(session.execute(expense_sql_resq))[0])
         profit = income - expense
