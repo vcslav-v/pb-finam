@@ -296,7 +296,7 @@ def get_short_stat(fr_to: schemas.ShortStat) -> schemas.ShortStat:
         income_resp = next(session.execute(income_sql_resq))[0]
         expense_resp = next(session.execute(expense_sql_resq))[0]
         income = int(income_resp) if income_resp else 0
-        expense = int(expense_resp) if income_resp else 0
+        expense = int(expense_resp) if expense_resp else 0
         profit = income - expense
         return schemas.ShortStat(
             frm=fr_to.frm,
