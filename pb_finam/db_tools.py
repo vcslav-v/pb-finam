@@ -127,7 +127,7 @@ def add_transaction(transaction: schemas.Transaction):
         if not category:
             raise ValueError('Category is not exist')
         db_transaction.category = category
-        #_check_exchange_rate(session, transaction.date)
+        _check_exchange_rate(session, transaction.date)
         session.add(db_transaction)
         session.commit()
 
