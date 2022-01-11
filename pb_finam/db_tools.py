@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from loguru import logger
@@ -12,6 +12,8 @@ BASE_CAT = '__BASE__'
 OPEN_EXCHANGE_TOKEN = os.environ.get('OPEN_EXCHANGE_TOKEN') or ''
 OPEN_EXCHANGE_ENDPOINT = 'https://openexchangerates.org/api/historical/'
 TRANSACTIONS_IN_PAGE = 30
+CATEGORIES_FOR_SITE_STAT = os.environ.get('CATEGORIES_FOR_SITE_STAT') or ''
+CATEGORIES_FOR_SITE_STAT = json.loads(CATEGORIES_FOR_SITE_STAT)
 
 
 def _add_currencies(session: SessionLocal, currencies: list[str]):
@@ -345,3 +347,87 @@ def get_debt():
                 acc.debt.append(schemas.Debt(name=cur.name, value=max_balance - value))
             debts.accs.append(acc)
         return debts
+
+
+@logger.catch
+def get_site_stat_data(year: int) -> schemas.FinSiteStat:
+    result = schemas.FinSiteStat()
+    all_cats = []
+    for cats in CATEGORIES_FOR_SITE_STAT.values():
+        for cat in cats:
+            all_cats.extend(cat[1])
+    monthes = []
+    for month_num in range(1, 12):
+        first_day_month = datetime(year, month_num, 1).date()
+        last_day_month = datetime(year, month_num + 1, 1).date() - timedelta(1)
+        monthes.append((first_day_month.strftime("%B"), first_day_month, last_day_month))
+    first_day_month = datetime(year, 12, 1).date()
+    last_day_month = datetime(year + 1, 1, 1).date() - timedelta(1)
+    monthes.append((first_day_month.strftime("%B"), first_day_month, last_day_month))
+
+    with SessionLocal() as session:
+        db_transactions = session.query(
+            models.Transaction
+        ).filter(
+            models.Transaction.date <= datetime(year + 1, 1, 1).date() - timedelta(1)
+        ).filter(
+            models.Transaction.date >= datetime(year, 1, 1).date()
+        ).filter(
+            models.Transaction.category_id.in_(all_cats)
+        ).order_by(
+            models.Transaction.date.desc()
+        ).order_by(
+            models.Transaction.date_create.desc()
+        ).order_by(
+            models.Transaction.id.desc()
+        ).all()
+
+        for db_transaction in db_transactions:
+            category_path = _get_category_path(db_transaction.category)
+            category_path.reverse()
+            result.rows.append(schemas.PageTransaction(
+                id=db_transaction.id,
+                date=db_transaction.date.strftime('%d-%m-%Y'),
+                value=f'{round(db_transaction.value/100, 2)} {db_transaction.currency.name}',
+                comment=db_transaction.comment,
+                base_category=category_path[0],
+                category='/'.join(category_path[1:]),
+            ))
+
+        for cat in CATEGORIES_FOR_SITE_STAT['income']:
+            cat_name, cat_ids = cat
+            result.income_graphs.append(schemas.Graph(name=cat_name))
+            for month in monthes:
+                month_name, first_day, last_day = month
+                db_req = f'''
+                    select sum(transactions.value / exchange_rates.value)/100 as dollars
+                    from transactions join exchange_rates
+                    on exchange_rates.currency_id = transactions.currency_id
+                    and exchange_rates.date = transactions.date
+                    where transactions.date >= '{first_day.isoformat()}'
+                    and  transactions.date <= '{last_day.isoformat()}'
+                    and category_id in ({", ".join(map(lambda x: str(x), cat_ids))});
+                '''
+                result.income_graphs[-1].x.append(month_name)
+                val = next(session.execute(db_req))[0]
+                result.income_graphs[-1].y.append(int(val) if val else 0)
+
+        for cat in CATEGORIES_FOR_SITE_STAT['expense']:
+            cat_name, cat_ids = cat
+            result.expense_graphs.append(schemas.Graph(name=cat_name))
+            for month in monthes:
+                month_name, first_day, last_day = month
+                db_req = f'''
+                    select sum(transactions.value / exchange_rates.value)/100 as dollars
+                    from transactions join exchange_rates
+                    on exchange_rates.currency_id = transactions.currency_id
+                    and exchange_rates.date = transactions.date
+                    where transactions.date >= '{first_day.isoformat()}'
+                    and  transactions.date <= '{last_day.isoformat()}'
+                    and category_id in ({", ".join(map(lambda x: str(x), cat_ids))});
+                '''
+                result.expense_graphs[-1].x.append(month_name)
+                val = next(session.execute(db_req))[0]
+                result.expense_graphs[-1].y.append(int(val) if val else 0)
+
+        return result

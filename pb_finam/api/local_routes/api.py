@@ -72,3 +72,11 @@ def get_сurrencies(_: str = Depends(get_current_username)) -> schemas.Items:
 @router.get('/debt')
 def get_debt(_: str = Depends(get_current_username)) -> schemas.Debts:
     return db_tools.get_debt()
+
+
+@router.get('/site_stat_data')
+def get_site_stat_data(
+    year: int,
+    _: str = Depends(get_current_username)
+) -> schemas.FinSiteStat:
+    return db_tools.get_site_stat_data(year)

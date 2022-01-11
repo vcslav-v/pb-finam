@@ -76,3 +76,16 @@ class Acc(BaseModel):
 
 class Debts(BaseModel):
     accs: list[Acc]
+
+
+class Graph(BaseModel):
+    x: list[str] = []
+    y: list[int] = []
+    name: str = ''
+    type: str = 'bar'
+
+
+class FinSiteStat(TransactionPage):
+    income_graphs: list[Graph] = []
+    expense_graphs: list[Graph] = []
+
