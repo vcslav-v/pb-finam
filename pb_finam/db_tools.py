@@ -12,7 +12,7 @@ BASE_CAT = '__BASE__'
 OPEN_EXCHANGE_TOKEN = os.environ.get('OPEN_EXCHANGE_TOKEN') or ''
 OPEN_EXCHANGE_ENDPOINT = 'https://openexchangerates.org/api/historical/'
 TRANSACTIONS_IN_PAGE = 30
-CATEGORIES_FOR_SITE_STAT = os.environ.get('CATEGORIES_FOR_SITE_STAT') or ''
+CATEGORIES_FOR_SITE_STAT = os.environ.get('CATEGORIES_FOR_SITE_STAT') or '{"expense": [["name", [0]]], "income": [["name_2", [1]]]}'
 CATEGORIES_FOR_SITE_STAT = json.loads(CATEGORIES_FOR_SITE_STAT)
 
 
