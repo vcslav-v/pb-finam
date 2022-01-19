@@ -77,6 +77,7 @@ def get_debt(_: str = Depends(get_current_username)) -> schemas.Debts:
 @router.get('/site_stat_data')
 def get_site_stat_data(
     year: int,
+    site_name: str,
     _: str = Depends(get_current_username)
 ) -> schemas.FinSiteStat:
-    return db_tools.get_site_stat_data(year)
+    return db_tools.get_site_stat_data(year, site_name)

@@ -350,10 +350,11 @@ def get_debt():
 
 
 @logger.catch
-def get_site_stat_data(year: int) -> schemas.FinSiteStat:
+def get_site_stat_data(year: int, site_name: str) -> schemas.FinSiteStat:
     result = schemas.FinSiteStat()
     all_cats = []
-    for cats in CATEGORIES_FOR_SITE_STAT.values():
+    cattegories = CATEGORIES_FOR_SITE_STAT[site_name]
+    for cats in cattegories.values():
         for cat in cats:
             all_cats.extend(cat[1])
     monthes = []
@@ -394,7 +395,7 @@ def get_site_stat_data(year: int) -> schemas.FinSiteStat:
                 category='/'.join(category_path[1:]),
             ))
 
-        for cat in CATEGORIES_FOR_SITE_STAT['income']:
+        for cat in cattegories['income']:
             cat_name, cat_ids = cat
             result.income_graphs.append(schemas.Graph(name=cat_name))
             for month in monthes:
@@ -412,7 +413,7 @@ def get_site_stat_data(year: int) -> schemas.FinSiteStat:
                 val = next(session.execute(db_req))[0]
                 result.income_graphs[-1].y.append(int(val) if val else 0)
 
-        for cat in CATEGORIES_FOR_SITE_STAT['expense']:
+        for cat in cattegories['expense']:
             cat_name, cat_ids = cat
             result.expense_graphs.append(schemas.Graph(name=cat_name))
             for month in monthes:
