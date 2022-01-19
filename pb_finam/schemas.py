@@ -88,4 +88,4 @@ class Graph(BaseModel):
 class FinSiteStat(TransactionPage):
     income_graphs: list[Graph] = []
     expense_graphs: list[Graph] = []
-
+    profit_graphs: list[Graph] = []

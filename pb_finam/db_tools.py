@@ -394,6 +394,10 @@ def get_site_stat_data(year: int, site_name: str) -> schemas.FinSiteStat:
                 base_category=category_path[0],
                 category='/'.join(category_path[1:]),
             ))
+        result.profit_graphs.append(schemas.Graph(name='profit', type='scatter'))
+        for month in monthes:
+            month_name, _, _ = month
+            result.profit_graphs[-1].x.append(month_name)
 
         for cat in cattegories['income']:
             cat_name, cat_ids = cat
@@ -411,12 +415,14 @@ def get_site_stat_data(year: int, site_name: str) -> schemas.FinSiteStat:
                 '''
                 result.income_graphs[-1].x.append(month_name)
                 val = next(session.execute(db_req))[0]
-                result.income_graphs[-1].y.append(int(val) if val else 0)
+                month_income = int(val) if val else 0
+                result.income_graphs[-1].y.append(month_income)
+                result.profit_graphs[-1].y.append(month_income)
 
         for cat in cattegories['expense']:
             cat_name, cat_ids = cat
             result.expense_graphs.append(schemas.Graph(name=cat_name))
-            for month in monthes:
+            for month_num, month in enumerate(monthes):
                 month_name, first_day, last_day = month
                 db_req = f'''
                     select sum(transactions.value / exchange_rates.value)/100 as dollars
@@ -429,6 +435,8 @@ def get_site_stat_data(year: int, site_name: str) -> schemas.FinSiteStat:
                 '''
                 result.expense_graphs[-1].x.append(month_name)
                 val = next(session.execute(db_req))[0]
-                result.expense_graphs[-1].y.append(int(val) if val else 0)
+                month_expense = int(val) if val else 0
+                result.expense_graphs[-1].y.append(month_expense)
+                result.profit_graphs[-1].y[month_num] -= month_expense
 
         return result
