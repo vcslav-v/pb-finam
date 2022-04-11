@@ -7,11 +7,12 @@ sched = BlockingScheduler()
 
 
 @logger.catch
-@sched.scheduled_job('cron', hour=13)
+@sched.scheduled_job('cron', hour=15, minutes=41)
 def add_stripe_transactions():
     logger.info('Add stripe transactions')
     next_last_payment, payments_data = stripe_connector.get_stripe_transactions()
-    stripe_connector.save_stripe_transactions(next_last_payment, payments_data)
+    if next_last_payment and payments_data:
+        stripe_connector.save_stripe_transactions(next_last_payment, payments_data)
 
 
 if __name__ == "__main__":

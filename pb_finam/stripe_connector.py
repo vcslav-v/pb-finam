@@ -17,7 +17,8 @@ def get_stripe_transactions() -> tuple[str, dict]:
     payments = stripe.PaymentIntent.list(ending_before=last_payment)
     work_payment_date = datetime.fromtimestamp(0)
     payments_data = {}
-
+    next_last_payment = ''
+    today = datetime.utcnow().date()
     for payment in payments.auto_paging_iter():
         if payment['invoice']:
             invoice = stripe.Invoice.retrieve(payment['invoice'])
@@ -40,8 +41,11 @@ def get_stripe_transactions() -> tuple[str, dict]:
                 'Plus Monthly': 0,
                 'Premium': 0
             }
-        next_last_payment = payment['id']
-        payments_data[payment_date_creation.strftime('%Y-%m-%d')][product_name] += payment_amount
+        if today != payment_date_creation:
+            next_last_payment = payment['id']
+            payments_data[
+                payment_date_creation.strftime('%Y-%m-%d')
+            ][product_name] += payment_amount
     return (next_last_payment, payments_data)
 
 
