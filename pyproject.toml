@@ -16,6 +16,8 @@ SQLAlchemy = "^1.4.27"
 psycopg2-binary = "^2.9.2"
 alembic = "^1.7.5"
 requests = "^2.26.0"
+stripe = "^2.71.0"
+APScheduler = "^3.9.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

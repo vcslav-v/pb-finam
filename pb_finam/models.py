@@ -71,3 +71,13 @@ class Category(Base):
     active = Column(Boolean, default=True)
 
     transactions = relationship('Transaction', back_populates='category')
+
+
+class LastStripePaymentId(Base):
+    """Last Stripe Payment Id"""
+
+    __tablename__ = 'last_stripe_payment_id'
+
+    id = Column(Integer, primary_key=True)
+
+    value = Column(Text)

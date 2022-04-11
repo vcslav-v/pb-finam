@@ -441,3 +441,18 @@ def get_site_stat_data(year: int, site_name: str) -> schemas.FinSiteStat:
                 result.profit_graphs[-1].y[month_num] -= month_expense
 
         return result
+
+
+@logger.catch
+def get_last_stripe_payment_id() -> str:
+    with SessionLocal() as session:
+        last_stripe_payment_id = session.query(models.LastStripePaymentId).first()
+        return last_stripe_payment_id.value
+
+
+@logger.catch
+def set_last_stripe_payment_id(new_last_stripe_payment_id: str):
+    with SessionLocal() as session:
+        last_stripe_payment_id = session.query(models.LastStripePaymentId).first()
+        last_stripe_payment_id.value = new_last_stripe_payment_id
+        session.commit()
