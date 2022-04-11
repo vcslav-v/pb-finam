@@ -57,7 +57,7 @@ def save_stripe_transactions(next_last_payment: str, payments_data: dict):
             break
     for payment_date, payments in payments_data.items():
         for payment_type, payment_amount in payments.items():
-            if payment_amount < 0:
+            if payment_amount == 0:
                 continue
             transaction = schemas.Transaction(
                 date=payment_date,
