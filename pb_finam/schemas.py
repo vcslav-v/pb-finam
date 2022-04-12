@@ -89,3 +89,12 @@ class FinSiteStat(TransactionPage):
     income_graphs: list[Graph] = []
     expense_graphs: list[Graph] = []
     profit_graphs: list[Graph] = []
+
+
+class PlusSiteData(TransactionPage):
+    plus_graphs: list[Graph] = []
+
+
+class SubsStat(BaseModel):
+    year: int = 0
+    month: int = 0

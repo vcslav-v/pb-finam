@@ -81,3 +81,19 @@ class LastStripePaymentId(Base):
     id = Column(Integer, primary_key=True)
 
     value = Column(Text)
+
+
+class SubscriptionStatistics(Base):
+    """SubscriptionStatistics"""
+
+    __tablename__ = 'subscription_statistics'
+
+    id = Column(Integer, primary_key=True)
+
+    date = Column(Date)
+    gross_subs_year = Column(Integer)
+    gross_subs_month = Column(Integer)
+    new_subs_year = Column(Integer)
+    new_subs_month = Column(Integer)
+    canceled_subs_year = Column(Integer)
+    canceled_subs_month = Column(Integer)

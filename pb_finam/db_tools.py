@@ -456,3 +456,25 @@ def set_last_stripe_payment_id(new_last_stripe_payment_id: str):
         last_stripe_payment_id = session.query(models.LastStripePaymentId).first()
         last_stripe_payment_id.value = new_last_stripe_payment_id
         session.commit()
+
+
+@logger.catch
+def add_subscription_stat(
+    date,
+    amount_active_subs: schemas.SubsStat,
+    amount_new_subs: schemas.SubsStat,
+    amount_canceled_subs: schemas.SubsStat,
+):
+    with SessionLocal() as session:
+        db_data = session.query(models.SubscriptionStatistics).filter_by(date=date).first()
+        if not db_data:
+            db_data = models.SubscriptionStatistics()
+        db_data.date = date
+        db_data.gross_subs_year = amount_active_subs.year
+        db_data.gross_subs_month = amount_active_subs.month
+        db_data.new_subs_year = amount_new_subs.year
+        db_data.new_subs_month = amount_new_subs.month
+        db_data.canceled_subs_year = amount_canceled_subs.year
+        db_data.canceled_subs_month = amount_canceled_subs.month
+        session.add(db_data)
+        session.commit()

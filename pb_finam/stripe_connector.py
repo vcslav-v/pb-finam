@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import stripe
 
@@ -68,3 +68,34 @@ def save_stripe_transactions(next_last_payment: str, payments_data: dict):
             )
             db_tools.add_transaction(transaction)
     db_tools.set_last_stripe_payment_id(next_last_payment)
+
+
+def get_stripe_subscriptions() -> tuple[schemas.SubsStat]:
+    stripe.api_key = os.environ.get('STRIPE_API_KEY', '')
+    amount_active_subs = schemas.SubsStat()
+    amount_canceled_subs = schemas.SubsStat()
+    amount_new_subs = schemas.SubsStat()
+    yesterday = datetime.utcnow().date() - timedelta(days=1)
+
+    active_subs = stripe.Subscription.list(status='active')
+    for active_sub in active_subs.auto_paging_iter():
+        interval = active_sub['items']['data'][0]['plan']['interval']
+        if interval == 'year':
+            amount_active_subs.year += 1
+        elif interval == 'month':
+            amount_active_subs.month += 1
+        if datetime.fromtimestamp(active_sub['created']).date() == yesterday:
+            if interval == 'year':
+                amount_new_subs.year += 1
+            elif interval == 'month':
+                amount_new_subs.month += 1
+
+    ended_subs = stripe.Subscription.list(status='canceled')
+    for ended_sub in ended_subs.auto_paging_iter():
+        interval = ended_sub['items']['data'][0]['plan']['interval']
+        if datetime.fromtimestamp(ended_sub['canceled_at']).date() == yesterday:
+            if interval == 'year':
+                amount_canceled_subs.year += 1
+            elif interval == 'month':
+                amount_canceled_subs.month += 1
+    return (yesterday, amount_active_subs, amount_new_subs, amount_canceled_subs)
