@@ -443,6 +443,43 @@ def get_site_stat_data(year: int, site_name: str) -> schemas.FinSiteStat:
         return result
 
 
+def get_plus_data() -> schemas.PlusSiteData:
+    result = schemas.PlusSiteData()
+    gross_subs_year = schemas.Graph(name='All year subs', type='scatter')
+    gross_subs_month = schemas.Graph(name='All month subs', type='scatter')
+    new_subs_year = schemas.Graph(name='New year subs', type='scatter')
+    new_subs_month = schemas.Graph(name='New month subs', type='scatter')
+    canceled_subs_year = schemas.Graph(name='Canceled year subs', type='scatter')
+    canceled_subs_month = schemas.Graph(name='Canceled month subs', type='scatter')
+
+    with SessionLocal() as session:
+        db_data = session.query(models.SubscriptionStatistics).order_by(
+            models.SubscriptionStatistics.date
+        ).all()
+        for row in db_data:
+            gross_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
+            gross_subs_year.y.append(row.gross_subs_year)
+            gross_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
+            gross_subs_month.y.append(row.gross_subs_month)
+            new_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
+            new_subs_year.y.append(row.new_subs_year)
+            new_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
+            new_subs_month.y.append(row.new_subs_month)
+            canceled_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
+            canceled_subs_year.y.append(row.canceled_subs_year)
+            canceled_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
+            canceled_subs_month.y.append(row.canceled_subs_month)
+    result.plus_graphs = [
+        gross_subs_year,
+        gross_subs_month,
+        new_subs_year,
+        new_subs_month,
+        canceled_subs_year,
+        canceled_subs_month,
+    ]
+    return result
+
+
 @logger.catch
 def get_last_stripe_payment_id() -> str:
     with SessionLocal() as session:

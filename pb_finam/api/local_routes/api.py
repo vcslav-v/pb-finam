@@ -81,3 +81,10 @@ def get_site_stat_data(
     _: str = Depends(get_current_username)
 ) -> schemas.FinSiteStat:
     return db_tools.get_site_stat_data(year, site_name)
+
+
+@router.get('/get_plus_data')
+def get_plus_data(
+    _: str = Depends(get_current_username)
+) -> schemas.FinSiteStat:
+    return db_tools.get_plus_data()
