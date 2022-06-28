@@ -1,6 +1,8 @@
 import json
 import os
 from datetime import datetime, timedelta
+import re
+import requests
 
 import stripe
 
@@ -9,6 +11,7 @@ from pb_finam import db_tools
 
 STRIPE_CATEGORIES = os.environ.get('STRIPE_CATEGORIES', '{}')
 STRIPE_CATEGORIES = json.loads(STRIPE_CATEGORIES)
+RE_LIFETIME = re.compile('Plus Lifetime')
 
 
 def get_stripe_transactions() -> tuple[str, dict]:
@@ -19,6 +22,7 @@ def get_stripe_transactions() -> tuple[str, dict]:
     payments_data = {}
     next_last_payment = ''
     today = datetime.utcnow().date()
+    amount_new_lifetime_yesterday = 0
     for payment in payments.auto_paging_iter():
         if payment['invoice']:
             invoice = stripe.Invoice.retrieve(payment['invoice'])
@@ -28,6 +32,10 @@ def get_stripe_transactions() -> tuple[str, dict]:
             payment_date_creation = datetime.fromtimestamp(payment['created']).date()
             product_name = product['name']
         elif payment['charges']['data'] and payment['charges']['data'][0]['paid']:
+            receipt = requests.get(payment['charges']['data'][0]['receipt_url'])
+            if RE_LIFETIME.findall(receipt.text):
+                product_name = 'Plus Lifetime'
+                amount_new_lifetime_yesterday += 1
             payment_amount = payment['amount']
             payment_date_creation = datetime.fromtimestamp(payment['created']).date()
             product_name = 'Premium'
@@ -37,6 +45,7 @@ def get_stripe_transactions() -> tuple[str, dict]:
         if work_payment_date != payment_date_creation:
             work_payment_date = payment_date_creation
             payments_data[work_payment_date.strftime('%Y-%m-%d')] = {
+                'Plus Lifetime': 0,
                 'Plus Yearly': 0,
                 'Plus Monthly': 0,
                 'Premium': 0
@@ -46,7 +55,7 @@ def get_stripe_transactions() -> tuple[str, dict]:
             payments_data[
                 payment_date_creation.strftime('%Y-%m-%d')
             ][product_name] += payment_amount
-    return (next_last_payment, payments_data)
+    return (next_last_payment, payments_data, amount_new_lifetime_yesterday)
 
 
 def save_stripe_transactions(next_last_payment: str, payments_data: dict):

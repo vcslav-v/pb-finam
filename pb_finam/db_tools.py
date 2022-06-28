@@ -14,6 +14,8 @@ OPEN_EXCHANGE_ENDPOINT = 'https://openexchangerates.org/api/historical/'
 TRANSACTIONS_IN_PAGE = 30
 CATEGORIES_FOR_SITE_STAT = os.environ.get('CATEGORIES_FOR_SITE_STAT') or '{"expense": [["name", [0]]], "income": [["name_2", [1]]]}'
 CATEGORIES_FOR_SITE_STAT = json.loads(CATEGORIES_FOR_SITE_STAT)
+STRIPE_CATEGORIES = os.environ.get('STRIPE_CATEGORIES', '{}')
+STRIPE_CATEGORIES = json.loads(STRIPE_CATEGORIES)
 
 
 def _add_currencies(session: SessionLocal, currencies: list[str]):
@@ -447,6 +449,7 @@ def get_plus_data() -> schemas.PlusSiteData:
     result = schemas.PlusSiteData()
     gross_subs_year = schemas.Graph(name='All year subs', type='scatter')
     gross_subs_month = schemas.Graph(name='All month subs', type='scatter')
+    new_subs_lifetime = schemas.Graph(name='All year subs', type='bar')
     new_subs_year = schemas.Graph(name='New year subs', type='scatter')
     new_subs_month = schemas.Graph(name='New month subs', type='scatter')
     canceled_subs_year = schemas.Graph(name='Canceled year subs', type='scatter')
@@ -459,6 +462,8 @@ def get_plus_data() -> schemas.PlusSiteData:
         for row in db_data:
             gross_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
             gross_subs_year.y.append(row.gross_subs_year)
+            new_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
+            new_subs_lifetime.y.append(row.new_subs_lifetime)
             gross_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
             gross_subs_month.y.append(row.gross_subs_month)
             new_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
@@ -513,5 +518,6 @@ def add_subscription_stat(
         db_data.new_subs_month = amount_new_subs.month
         db_data.canceled_subs_year = amount_canceled_subs.year
         db_data.canceled_subs_month = amount_canceled_subs.month
+        db_data.new_subs_lifetime = amount_new_subs.lifetime
         session.add(db_data)
         session.commit()

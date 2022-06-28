@@ -98,3 +98,4 @@ class PlusSiteData(TransactionPage):
 class SubsStat(BaseModel):
     year: int = 0
     month: int = 0
+    lifetime: int = 0
