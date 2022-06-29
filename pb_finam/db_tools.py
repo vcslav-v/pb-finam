@@ -449,7 +449,7 @@ def get_plus_data() -> schemas.PlusSiteData:
     result = schemas.PlusSiteData()
     gross_subs_year = schemas.Graph(name='All year subs', type='scatter')
     gross_subs_month = schemas.Graph(name='All month subs', type='scatter')
-    new_subs_lifetime = schemas.Graph(name='All year subs', type='bar')
+    new_subs_lifetime = schemas.Graph(name='All year subs', type='bar', yaxis='y2')
     new_subs_year = schemas.Graph(name='New year subs', type='scatter')
     new_subs_month = schemas.Graph(name='New month subs', type='scatter')
     canceled_subs_year = schemas.Graph(name='Canceled year subs', type='scatter')
