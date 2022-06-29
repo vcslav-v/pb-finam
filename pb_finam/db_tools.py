@@ -481,6 +481,7 @@ def get_plus_data() -> schemas.PlusSiteData:
         new_subs_month,
         canceled_subs_year,
         canceled_subs_month,
+        new_subs_lifetime
     ]
     return result
 
