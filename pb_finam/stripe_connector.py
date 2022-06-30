@@ -84,14 +84,19 @@ def get_stripe_subscriptions() -> tuple[schemas.SubsStat]:
     amount_active_subs = schemas.SubsStat()
     amount_canceled_subs = schemas.SubsStat()
     amount_new_subs = schemas.SubsStat()
+    year_gross_usd = 0
+    month_gross_usd = 0
     yesterday = datetime.utcnow().date() - timedelta(days=1)
 
     active_subs = stripe.Subscription.list(status='active')
     for active_sub in active_subs.auto_paging_iter():
         interval = active_sub['items']['data'][0]['plan']['interval']
+        price = active_sub['items']['data'][0]['price']['unit_amount_decimal']
         if interval == 'year':
             amount_active_subs.year += 1
+            year_gross_usd += price
         elif interval == 'month':
+            month_gross_usd += price
             amount_active_subs.month += 1
         if datetime.fromtimestamp(active_sub['created']).date() == yesterday:
             if interval == 'year':
@@ -107,4 +112,11 @@ def get_stripe_subscriptions() -> tuple[schemas.SubsStat]:
                 amount_canceled_subs.year += 1
             elif interval == 'month':
                 amount_canceled_subs.month += 1
-    return (yesterday, amount_active_subs, amount_new_subs, amount_canceled_subs)
+    return (
+        yesterday,
+        amount_active_subs,
+        amount_new_subs,
+        amount_canceled_subs,
+        month_gross_usd,
+        year_gross_usd,
+    )

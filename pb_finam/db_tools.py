@@ -449,7 +449,7 @@ def get_plus_data() -> schemas.PlusSiteData:
     result = schemas.PlusSiteData()
     gross_subs_year = schemas.Graph(name='All year subs', type='scatter')
     gross_subs_month = schemas.Graph(name='All month subs', type='scatter')
-    new_subs_lifetime = schemas.Graph(name='All year subs', type='bar', yaxis='y2', opacity=0.5)
+    new_subs_lifetime = schemas.Graph(name='New Lifetime subs', type='bar', yaxis='y2', opacity=0.5)
     new_subs_year = schemas.Graph(name='New year subs', type='scatter')
     new_subs_month = schemas.Graph(name='New month subs', type='scatter')
     canceled_subs_year = schemas.Graph(name='Canceled year subs', type='scatter')
@@ -511,6 +511,8 @@ def add_subscription_stat(
     amount_active_subs: schemas.SubsStat,
     amount_new_subs: schemas.SubsStat,
     amount_canceled_subs: schemas.SubsStat,
+    month_gross_usd: int,
+    year_gross_usd: int,
 ):
     with SessionLocal() as session:
         db_data = session.query(models.SubscriptionStatistics).filter_by(date=date).first()
@@ -524,5 +526,7 @@ def add_subscription_stat(
         db_data.canceled_subs_year = amount_canceled_subs.year
         db_data.canceled_subs_month = amount_canceled_subs.month
         db_data.new_subs_lifetime = amount_new_subs.lifetime
+        db_data.month_gross_usd = month_gross_usd
+        db_data.year_gross_usd = year_gross_usd
         session.add(db_data)
         session.commit()

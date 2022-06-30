@@ -16,7 +16,14 @@ def add_stripe_subscriptions(
     amount_new_lifetime_yesterday: int
 ):
     logger.info('Add stripe subscriptions')
-    yesterday, amount_active_subs, amount_new_subs, amount_canceled_subs = (
+    (
+        yesterday,
+        amount_active_subs,
+        amount_new_subs,
+        amount_canceled_subs,
+        month_gross_usd,
+        year_gross_usd,
+    ) = (
         stripe_connector.get_stripe_subscriptions()
     )
     amount_new_subs.lifetime = amount_new_lifetime_yesterday
@@ -25,6 +32,8 @@ def add_stripe_subscriptions(
         amount_active_subs,
         amount_new_subs,
         amount_canceled_subs,
+        month_gross_usd,
+        year_gross_usd,
     )
 
 

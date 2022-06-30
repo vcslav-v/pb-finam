@@ -98,3 +98,5 @@ class SubscriptionStatistics(Base):
     new_subs_month = Column(Integer)
     canceled_subs_year = Column(Integer)
     canceled_subs_month = Column(Integer)
+    month_gross_usd = Column(Integer)
+    year_gross_usd = Column(Integer)
