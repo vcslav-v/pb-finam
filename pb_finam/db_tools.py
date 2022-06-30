@@ -474,6 +474,8 @@ def get_plus_data() -> schemas.PlusSiteData:
             canceled_subs_year.y.append(row.canceled_subs_year)
             canceled_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
             canceled_subs_month.y.append(row.canceled_subs_month)
+        result.month_gross_usd = row.month_gross_usd
+        result.year_gross_usd = row.year_gross_usd
 
     result.gross_data = [
         gross_subs_year,
@@ -487,6 +489,7 @@ def get_plus_data() -> schemas.PlusSiteData:
         canceled_subs_year,
         canceled_subs_month,
     ]
+    result.month_gross_usd
     return result
 
 
