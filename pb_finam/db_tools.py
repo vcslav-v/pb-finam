@@ -12,7 +12,10 @@ BASE_CAT = '__BASE__'
 OPEN_EXCHANGE_TOKEN = os.environ.get('OPEN_EXCHANGE_TOKEN') or ''
 OPEN_EXCHANGE_ENDPOINT = 'https://openexchangerates.org/api/historical/'
 TRANSACTIONS_IN_PAGE = 30
-CATEGORIES_FOR_SITE_STAT = os.environ.get('CATEGORIES_FOR_SITE_STAT') or '{"expense": [["name", [0]]], "income": [["name_2", [1]]]}'
+CATEGORIES_FOR_SITE_STAT = os.environ.get(
+    'CATEGORIES_FOR_SITE_STAT',
+    '{"expense": [["name", [0]]], "income": [["name_2", [1]]]}'
+)
 CATEGORIES_FOR_SITE_STAT = json.loads(CATEGORIES_FOR_SITE_STAT)
 STRIPE_CATEGORIES = os.environ.get('STRIPE_CATEGORIES', '{}')
 STRIPE_CATEGORIES = json.loads(STRIPE_CATEGORIES)
@@ -511,11 +514,11 @@ def set_last_stripe_payment_id(new_last_stripe_payment_id: str):
 @logger.catch
 def add_subscription_stat(
     date,
-    amount_active_subs: schemas.SubsStat,
-    amount_new_subs: schemas.SubsStat,
-    amount_canceled_subs: schemas.SubsStat,
-    month_gross_usd: int,
-    year_gross_usd: int,
+    month_gross_usd: int = None,
+    year_gross_usd: int = None,
+    amount_active_subs: schemas.SubsStat = None,
+    amount_new_subs: schemas.SubsStat = None,
+    amount_canceled_subs: schemas.SubsStat = None,
 ):
     with SessionLocal() as session:
         db_data = session.query(models.SubscriptionStatistics).filter_by(date=date).first()
