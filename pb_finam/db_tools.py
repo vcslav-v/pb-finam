@@ -469,7 +469,7 @@ def get_plus_data() -> schemas.PlusSiteData:
             gross_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
             gross_subs_month.y.append(row.gross_subs_month if row.gross_subs_month else 0)
             gross_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
-            gross_subs_lifetime.y.append(row.gross_subs_month if row.gross_subs_month else 0)
+            gross_subs_lifetime.y.append(row.gross_subs_lifetime if row.gross_subs_lifetime else 0)
             # new_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
             # new_subs_lifetime.y.append(row.new_subs_lifetime if row.new_subs_lifetime else 0)
             # new_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
