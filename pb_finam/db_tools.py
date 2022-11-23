@@ -20,6 +20,9 @@ CATEGORIES_FOR_SITE_STAT = json.loads(CATEGORIES_FOR_SITE_STAT)
 STRIPE_CATEGORIES = os.environ.get('STRIPE_CATEGORIES', '{}')
 STRIPE_CATEGORIES = json.loads(STRIPE_CATEGORIES)
 
+SUPOSED_PLUS_MONTH_PRICE = 1000
+SUPOSED_PLUS_YEAR_PRICE = 5900
+
 
 def _add_currencies(session: SessionLocal, currencies: list[str]):
     all_db_currency = session.query(models.Currency).filter_by(active=True).all()
@@ -480,8 +483,19 @@ def get_plus_data() -> schemas.PlusSiteData:
             # canceled_subs_year.y.append(row.canceled_subs_year if row.canceled_subs_year else 0)
             # canceled_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
             # canceled_subs_month.y.append(row.canceled_subs_month if row.canceled_subs_month else 0)
-        # result.month_gross_usd = row.month_gross_usd if row.month_gross_usd else 0
-        # result.year_gross_usd = row.year_gross_usd if row.year_gross_usd else 0
+        if row.month_gross_usd:
+            result.month_gross_usd = row.month_gross_usd
+        elif gross_subs_month.y and gross_subs_month.y[-1]:
+            result.month_gross_usd = gross_subs_month.y[-1] * SUPOSED_PLUS_MONTH_PRICE
+        else:
+            result.month_gross_usd = 0
+
+        if row.year_gross_usd:
+            result.year_gross_usd = row.year_gross_usd
+        elif gross_subs_year.y and gross_subs_year.y[-1]:
+            result.year_gross_usd = gross_subs_year.y[-1] * SUPOSED_PLUS_YEAR_PRICE
+        else:
+            result.year_gross_usd = 0
 
     result.gross_data = [
         gross_subs_year,
