@@ -464,19 +464,19 @@ def get_plus_data() -> schemas.PlusSiteData:
         ).all()
         for row in db_data:
             gross_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
-            gross_subs_year.y.append(row.gross_subs_year)
+            gross_subs_year.y.append(row.gross_subs_year if row.gross_subs_year else 0)
             new_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
-            new_subs_lifetime.y.append(row.new_subs_lifetime)
+            new_subs_lifetime.y.append(row.new_subs_lifetime if row.new_subs_lifetime else 0)
             gross_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
-            gross_subs_month.y.append(row.gross_subs_month)
+            gross_subs_month.y.append(row.gross_subs_month if row.gross_subs_month else 0)
             new_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
-            new_subs_year.y.append(row.new_subs_year)
+            new_subs_year.y.append(row.new_subs_year if row.new_subs_year else 0)
             new_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
-            new_subs_month.y.append(row.new_subs_month)
+            new_subs_month.y.append(row.new_subs_month if row.new_subs_month else 0)
             canceled_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
-            canceled_subs_year.y.append(row.canceled_subs_year)
+            canceled_subs_year.y.append(row.canceled_subs_year if row.canceled_subs_year else 0)
             canceled_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
-            canceled_subs_month.y.append(row.canceled_subs_month)
+            canceled_subs_month.y.append(row.canceled_subs_month if row.canceled_subs_month else 0)
         result.month_gross_usd = row.month_gross_usd
         result.year_gross_usd = row.year_gross_usd
 
