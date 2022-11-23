@@ -516,9 +516,9 @@ def add_subscription_stat(
     date,
     month_gross_usd: int = None,
     year_gross_usd: int = None,
-    amount_active_subs: schemas.SubsStat = None,
-    amount_new_subs: schemas.SubsStat = None,
-    amount_canceled_subs: schemas.SubsStat = None,
+    amount_active_subs: schemas.SubsStat = schemas.SubsStat(),
+    amount_new_subs: schemas.SubsStat = schemas.SubsStat(),
+    amount_canceled_subs: schemas.SubsStat = schemas.SubsStat(),
 ):
     with SessionLocal() as session:
         db_data = session.query(models.SubscriptionStatistics).filter_by(date=date).first()
