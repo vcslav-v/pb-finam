@@ -452,11 +452,12 @@ def get_plus_data() -> schemas.PlusSiteData:
     result = schemas.PlusSiteData()
     gross_subs_year = schemas.Graph(name='All year subs', type='scatter')
     gross_subs_month = schemas.Graph(name='All month subs', type='scatter')
-    new_subs_lifetime = schemas.Graph(name='New Lifetime subs', type='bar', yaxis='y2', opacity=0.5)
-    new_subs_year = schemas.Graph(name='New year subs', type='scatter')
-    new_subs_month = schemas.Graph(name='New month subs', type='scatter')
-    canceled_subs_year = schemas.Graph(name='Canceled year subs', type='scatter')
-    canceled_subs_month = schemas.Graph(name='Canceled month subs', type='scatter')
+    gross_subs_lifetime = schemas.Graph(name='All lifetime subs', type='scatter')
+    # new_subs_lifetime = schemas.Graph(name='New Lifetime subs', type='bar', yaxis='y2', opacity=0.5)
+    # new_subs_year = schemas.Graph(name='New year subs', type='scatter')
+    # new_subs_month = schemas.Graph(name='New month subs', type='scatter')
+    # canceled_subs_year = schemas.Graph(name='Canceled year subs', type='scatter')
+    # canceled_subs_month = schemas.Graph(name='Canceled month subs', type='scatter')
 
     with SessionLocal() as session:
         db_data = session.query(models.SubscriptionStatistics).order_by(
@@ -465,34 +466,35 @@ def get_plus_data() -> schemas.PlusSiteData:
         for row in db_data:
             gross_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
             gross_subs_year.y.append(row.gross_subs_year if row.gross_subs_year else 0)
-            new_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
-            new_subs_lifetime.y.append(row.new_subs_lifetime if row.new_subs_lifetime else 0)
             gross_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
             gross_subs_month.y.append(row.gross_subs_month if row.gross_subs_month else 0)
-            new_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
-            new_subs_year.y.append(row.new_subs_year if row.new_subs_year else 0)
-            new_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
-            new_subs_month.y.append(row.new_subs_month if row.new_subs_month else 0)
-            canceled_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
-            canceled_subs_year.y.append(row.canceled_subs_year if row.canceled_subs_year else 0)
-            canceled_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
-            canceled_subs_month.y.append(row.canceled_subs_month if row.canceled_subs_month else 0)
-        result.month_gross_usd = row.month_gross_usd if row.month_gross_usd else 0
-        result.year_gross_usd = row.year_gross_usd if row.year_gross_usd else 0
+            gross_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
+            gross_subs_lifetime.y.append(row.gross_subs_month if row.gross_subs_month else 0)
+            # new_subs_lifetime.x.append(row.date.strftime('%d-%m-%Y'))
+            # new_subs_lifetime.y.append(row.new_subs_lifetime if row.new_subs_lifetime else 0)
+            # new_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
+            # new_subs_year.y.append(row.new_subs_year if row.new_subs_year else 0)
+            # new_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
+            # new_subs_month.y.append(row.new_subs_month if row.new_subs_month else 0)
+            # canceled_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
+            # canceled_subs_year.y.append(row.canceled_subs_year if row.canceled_subs_year else 0)
+            # canceled_subs_month.x.append(row.date.strftime('%d-%m-%Y'))
+            # canceled_subs_month.y.append(row.canceled_subs_month if row.canceled_subs_month else 0)
+        # result.month_gross_usd = row.month_gross_usd if row.month_gross_usd else 0
+        # result.year_gross_usd = row.year_gross_usd if row.year_gross_usd else 0
 
     result.gross_data = [
         gross_subs_year,
         gross_subs_month,
-        new_subs_lifetime
+        gross_subs_lifetime
     ]
 
-    result.flow_data = [
-        new_subs_year,
-        new_subs_month,
-        canceled_subs_year,
-        canceled_subs_month,
-    ]
-    result.month_gross_usd
+    # result.flow_data = [
+    #     new_subs_year,
+    #     new_subs_month,
+    #     canceled_subs_year,
+    #     canceled_subs_month,
+    # ]
     return result
 
 
@@ -527,6 +529,7 @@ def add_subscription_stat(
         db_data.date = date
         db_data.gross_subs_year = amount_active_subs.year
         db_data.gross_subs_month = amount_active_subs.month
+        db_data.gross_subs_lifetime = amount_active_subs.lifetime
         db_data.new_subs_year = amount_new_subs.year
         db_data.new_subs_month = amount_new_subs.month
         db_data.canceled_subs_year = amount_canceled_subs.year

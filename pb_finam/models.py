@@ -93,6 +93,7 @@ class SubscriptionStatistics(Base):
     date = Column(Date)
     gross_subs_year = Column(Integer)
     gross_subs_month = Column(Integer)
+    gross_subs_lifetime = Column(Integer)
     new_subs_year = Column(Integer)
     new_subs_lifetime = Column(Integer)
     new_subs_month = Column(Integer)
