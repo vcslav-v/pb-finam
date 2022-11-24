@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import requests
 from loguru import logger
+from sqlalchemy import and_
 
 from pb_finam import models, schemas
 from pb_finam.db import SessionLocal
@@ -170,11 +171,14 @@ def get_transactions(page_data: schemas.GetTransactionPage) -> schemas.Transacti
         else:
             start = 0
             end = TRANSACTIONS_IN_PAGE
-
+        filter_conditions = and_(
+            models.Transaction.date <= page_data.from_date,
+            models.Transaction.comment.like('%or%')
+        )
         db_transactions = session.query(
             models.Transaction
         ).filter(
-            models.Transaction.date <= page_data.from_date
+            filter_conditions
         ).order_by(
             models.Transaction.date.desc()
         ).order_by(
