@@ -171,10 +171,13 @@ def get_transactions(page_data: schemas.GetTransactionPage) -> schemas.Transacti
         else:
             start = 0
             end = TRANSACTIONS_IN_PAGE
-        filter_conditions = and_(
-            models.Transaction.date <= page_data.from_date,
-            models.Transaction.comment.like('%or%')
-        )
+        if page_data.req_str:
+            filter_conditions = and_(
+                models.Transaction.date <= page_data.from_date,
+                models.Transaction.comment.like(f'%{page_data.req_str.lower()}%')
+            )
+        else:
+            filter_conditions = models.Transaction.date <= page_data.from_date
         db_transactions = session.query(
             models.Transaction
         ).filter(
