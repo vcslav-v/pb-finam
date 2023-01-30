@@ -102,6 +102,9 @@ class PlusSiteData(TransactionPage):
 
 
 class SubsStat(BaseModel):
-    year: Optional[int] = None
-    month: Optional[int] = None
-    lifetime: Optional[int] = None
+    year_count: Optional[int] = None
+    month_count: Optional[int] = None
+    lifetime_count: Optional[int] = None
+    year_sum: Optional[int] = None
+    month_sum: Optional[int] = None
+    lifetime_sum: Optional[int] = None

@@ -13,7 +13,10 @@ def get_subscriptions() -> schemas.SubsStat:
         data_json = json.loads(resp.text)
 
         return schemas.SubsStat(
-            year=data_json['year'],
-            month=data_json['month'],
-            lifetime=data_json['permanent'],
+            year_count=data_json['countYearsSubscriptions'],
+            month_count=data_json['countMonthSubscriptions'],
+            lifetime_count=data_json['countPermanentSubscriptions'],
+            year_sum=int(data_json['sumYearsSubscriptions'] * 100),
+            month_sum=int(data_json['sumMonthSubscriptions'] * 100),
+            lifetime_sum=int(data_json['sumPermanentSubscriptions'] * 100),
         )

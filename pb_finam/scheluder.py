@@ -44,11 +44,11 @@ def add_stripe_subscriptions(
 
 @logger.catch
 def renew_subs():
-    amount_active_subs = pb_connector.get_subscriptions()
+    subs_site_stat = pb_connector.get_subscriptions()
     yesterday = datetime.utcnow().date() - timedelta(days=1)
     db_tools.add_subscription_stat(
         yesterday,
-        amount_active_subs=amount_active_subs
+        subs_site_stat,
     )
 
 
