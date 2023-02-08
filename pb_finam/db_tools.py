@@ -471,8 +471,9 @@ def get_plus_data() -> schemas.PlusSiteData:
 
     with SessionLocal() as session:
         db_data = session.query(models.SubscriptionStatistics).order_by(
-            models.SubscriptionStatistics.date
+            models.SubscriptionStatistics.date.desc()
         ).limit(90).all()
+        db_data.reverse()
         for row in db_data:
             gross_subs_year.x.append(row.date.strftime('%d-%m-%Y'))
             gross_subs_year.y.append(row.gross_subs_year if row.gross_subs_year else 0)
