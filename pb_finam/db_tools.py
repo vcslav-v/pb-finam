@@ -1,10 +1,11 @@
 import json
 import os
 from datetime import datetime, timedelta
+import pandas as pd
 
 import requests
 from loguru import logger
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 
 from pb_finam import models, schemas
 from pb_finam.db import SessionLocal
@@ -557,3 +558,13 @@ def add_subscription_stat(
         db_data.year_gross_usd = subs_site_stat.year_sum
         session.add(db_data)
         session.commit()
+
+
+def get_all_db_data():
+    with SessionLocal() as session:
+        for table_name in models.ALL_TABEL_NAMES:
+            result = session.execute(text(f'SELECT * FROM {table_name}'))
+            df = pd.DataFrame(result.fetchall())
+            df = df.convert_dtypes()
+            df.columns = result.keys()
+            yield table_name, df

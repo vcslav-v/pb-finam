@@ -5,6 +5,12 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
+ALL_TABEL_NAMES = [
+    'transactions',
+    'сurrencies',
+    'exchange_rates',
+    'categories',
+]
 
 
 class Transaction(Base):

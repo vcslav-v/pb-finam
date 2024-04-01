@@ -1,5 +1,5 @@
 from loguru import logger
-from pb_finam import db_tools, stripe_connector, pb_connector
+from pb_finam import db_tools, stripe_connector, pb_connector, bq_sync
 from datetime import datetime, timedelta
 
 
@@ -55,3 +55,4 @@ def renew_subs():
 if __name__ == '__main__':
     # add_stripe_transactions()
     renew_subs()
+    bq_sync.sync()
