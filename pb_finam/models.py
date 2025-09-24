@@ -10,6 +10,8 @@ ALL_TABEL_NAMES = [
     'сurrencies',
     'exchange_rates',
     'categories',
+    'departments',
+    'employees',
 ]
 
 
