@@ -107,3 +107,23 @@ class SubscriptionStatistics(Base):
     canceled_subs_month = Column(Integer)
     month_gross_usd = Column(Integer)
     year_gross_usd = Column(Integer)
+
+
+class Department(Base):
+    """Departments"""
+
+    __tablename__ = 'departments'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(Text, unique=True)
+
+class Employee(Base):
+    """Employees"""
+
+    __tablename__ = 'employees'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(Text)
+    department_id = Column(Integer, ForeignKey('departments.id'))
